@@ -18,8 +18,5 @@ module.exports = (app) => {
   // Delete a Servant with id
   router.delete("/:id", servants.delete);
 
-  // Delete all Servants
-  router.delete("/", servants.deleteAll);
-
   app.use("/api/servants", router);
 };

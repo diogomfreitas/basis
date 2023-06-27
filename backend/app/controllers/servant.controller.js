@@ -1,6 +1,5 @@
 const db = require("../models");
 const Servant = db.servants;
-const Category = db.categories;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new Servant
@@ -18,7 +17,9 @@ exports.create = (req, res) => {
     name: req.body.name,
     registration: req.body.registration,
     department: req.body.department,
+    categoryId: req.body.category.id,
   };
+  console.log(servant);
 
   // Save Servant in the database
   Servant.create(servant)
@@ -36,6 +37,34 @@ exports.create = (req, res) => {
 // Retrieve all Servants from the database.
 exports.findAll = (req, res) => {
   const name = req.query.name;
+
+  console.log("teste");
+  console.log(name);
+
+  if (!isNaN(name)) {
+    Servant.findAll({
+      where: { registration: { [Op.eq]: name } },
+      include: ["category"],
+    })
+      .then((data) => {
+        if (data) {
+          res.send(data);
+        } else {
+          findByName(name, res);
+        }
+      })
+      .catch((err) => {
+        res.status(500).send({
+          message:
+            err.message || "Some error occurred while retrieving servants.",
+        });
+      });
+  } else {
+    findByName(name, res);
+  }
+};
+
+function findByName(name, res) {
   var condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
   console.log(name);
 
@@ -49,7 +78,7 @@ exports.findAll = (req, res) => {
           err.message || "Some error occurred while retrieving servants.",
       });
     });
-};
+}
 
 // Find a single Servant with an id
 exports.findOne = (req, res) => {
@@ -76,8 +105,10 @@ exports.findOne = (req, res) => {
 // Update a Servant by the id in the request
 exports.update = (req, res) => {
   const id = req.params.id;
+  const servant = req.body;
+  servant.categoryId = servant.category.id;
 
-  Servant.update(req.body, {
+  Servant.update(servant, {
     where: { id: id },
   })
     .then((num) => {
@@ -119,23 +150,6 @@ exports.delete = (req, res) => {
     .catch((err) => {
       res.status(500).send({
         message: "Could not delete Servant with id=" + id,
-      });
-    });
-};
-
-// Delete all Servants from the database.
-exports.deleteAll = (req, res) => {
-  Servant.destroy({
-    where: {},
-    truncate: false,
-  })
-    .then((nums) => {
-      res.send({ message: `${nums} Servants were deleted successfully!` });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while removing all servants.",
       });
     });
 };
