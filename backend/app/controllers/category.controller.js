@@ -1,6 +1,5 @@
 const db = require("../models");
 const Category = db.categories;
-const Op = db.Sequelize.Op;
 
 // Retrieve all Categories from the database.
 exports.findAll = (req, res) => {

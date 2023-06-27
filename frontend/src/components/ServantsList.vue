@@ -1,6 +1,6 @@
 <template>
     <div class="list row">
-      <div class="col-md-8">
+      <div class="col-md-12">
         <div class="input-group mb-3">
           <input type="text" class="form-control" placeholder="Buscar por nome ou matrícula..."
             v-model="name"/>

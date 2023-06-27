@@ -22,10 +22,21 @@ app.get("/", (req, res) => {
 });
 
 const db = require("./app/models");
-db.sequelize.sync();
-// db.sequelize.sync({ force: true }).then(() => {
-//   console.log("Drop and re-sync db.");
-// });
+// db.sequelize.sync();
+db.sequelize.sync({ force: true }).then(() => {
+  console.log("Drop and re-sync db.");
+  const Category = db.categories;
+  Category.findAll().then((data) => {
+    if (data.length == 0) {
+      Category.bulkCreate([
+        { title: "Efetivo" },
+        { title: "CNE" },
+        { title: "Secretário" },
+        { title: "Parlamentar" },
+      ]);
+    }
+  });
+});
 
 require("./app/routes/servant.routes")(app);
 require("./app/routes/category.routes")(app);
